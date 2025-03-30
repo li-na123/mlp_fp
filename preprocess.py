@@ -1,17 +1,19 @@
-def load_conll_data(filepath):
+from pathlib import Path
+
+def load_conll_data(filepath: Path):
     sentences = []
     labels = []
+    current_tokens = []
+    current_labels = []
 
-    with open(filepath, "r", encoding="utf-8") as f:
-        current_tokens = []
-        current_labels = []
+    with filepath.open("r", encoding="utf-8") as f:
 
         for line in f:
             line = line.strip()
 
             if line.startswith("# sent_enum"):
                 if current_tokens:  # Save previous sentence
-                    sentences.append(" ".join(current_tokens))
+                    sentences.append(current_tokens)
                     labels.append(current_labels)
                     current_tokens = []
                     current_labels = []
