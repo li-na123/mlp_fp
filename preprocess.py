@@ -30,7 +30,7 @@ def load_conll_data(filepath: Path):
             token, label = parts
 
             # Normalize labels
-            if label.lower() in {"fw", "ambiguous", "mixed"}:
+            if label.lower() in {"fw", "ambiguous"}:
                 label = "unk"
 
             current_tokens.append(token)
