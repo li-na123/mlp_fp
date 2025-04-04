@@ -1,12 +1,11 @@
+from sklearn.metrics import classification_report
 from nltk.corpus import words
-from preprocess_baseline import preprocess_test_conll
-
+from preprocess import load_conll_data
 from pathlib import Path
 from lingua import Language, LanguageDetectorBuilder
 import emoji
 from preprocess import *
 import spacy
-# import urbandictionary as ud
 import re
 import nltk
 nltk.download("words")
@@ -92,18 +91,28 @@ def classify_words(word):
     return label
 
 
-input_file = Path("data/test.conll")
-output_file = Path("data/test_baseline.conll")
+def add_baseline_predictions(input_file: Path, output_file: Path):
+    sentences, true_labels = load_conll_data(input_file)
 
-test_sentences, test_labels = preprocess_test_conll(input_file, output_file)
+    all_true_labels = []
+    all_predicted_labels = []
+    with output_file.open('w', encoding='utf-8') as f_out:
+        for sent_idx, (sentence_tokens, sent_true_labels) in enumerate(zip(sentences, true_labels)):
 
-for i in range(25):
-    print(f"SENTENCE {i}: {test_sentences[i]}")
+            f_out.write(f"# sent_enum = {sent_idx + 1}\n")
 
-    updated_labels = []
-    for word in test_sentences[i]:
-        updated_labels.append(classify_words(word))
+            for token, true_label in zip(sentence_tokens, sent_true_labels):
+                predicted_label = classify_words(token)
+                f_out.write(f"{token}\t{true_label}\t{predicted_label}\n")
 
-    test_labels[i] = updated_labels
+                all_true_labels.append(true_label)
+                all_predicted_labels.append(predicted_label)
 
-    print(f"UPDATED LABELS {i}: {test_labels[i]}")
+            f_out.write("\n")
+    print("Classification Report (Baseline):")
+    print(classification_report(all_true_labels, all_predicted_labels))
+
+
+input_file = Path("data/dev.conll")
+output_file = Path("data/dev_baseline.conll")
+add_baseline_predictions(input_file, output_file)
