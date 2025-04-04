@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def load_conll_data(filepath: Path):
     sentences = []
     labels = []
@@ -29,7 +30,7 @@ def load_conll_data(filepath: Path):
             token, label = parts
 
             # Normalize labels
-            if label.lower() in {"fw", "ambiguous"}:
+            if label.lower() in {"fw", "ambiguous", "mixed"}:
                 label = "unk"
 
             current_tokens.append(token)
